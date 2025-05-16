@@ -1,0 +1,48 @@
+line {
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone') {
+            steps {
+                sh 'git clone https://github.com/ramha-ch/jenkins-app.git'
+                sh 'cd jenkins-app'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building the application..."
+                sh 'docker build -t ramha-ch/jenkins-app .'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Running tests..."
+                sh 'docker run --rm ramha-ch/jenkins-app test' // Replace with your test command
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'JENKINS_PROJECT', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh "docker login -u ${rimsha524 -p ${Ali202006@}"
+                        sh "docker tag ramha-ch/jenkins-app ramha-ch/jenkins-app latest"
+                        sh "docker push ramha-ch/jenkins-app latest"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed!"
+        }
+    }
+}
